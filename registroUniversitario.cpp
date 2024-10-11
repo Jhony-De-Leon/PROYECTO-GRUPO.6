@@ -364,6 +364,122 @@ void asignarCursos() {
     }
 }
 
+void ingresarNotas(string carrera, string cursos[], float notasFinales[], string estados[]) {
+    for (int i = 0; i < 5; i++) {
+        cout << "Curso: " << cursos[i] << endl;
+
+        float primerParcial, segundoParcial, tarea, examenFinal;
+        
+        do {
+            cout << "\n      \n";
+            cout << "Ingrese nota del primer parcial (0-15): ";
+            cin >> primerParcial;
+        } while (primerParcial < 0 || primerParcial > 15);
+        do {
+            cout << "\n       \n";
+            cout << "Ingrese nota del segundo parcial (0-15): ";
+            cin >> segundoParcial;
+        } while (segundoParcial < 0 || segundoParcial > 15);
+
+        do {
+            cout << "\n    \n";
+            cout << "Ingrese nota de la tarea (0-35): ";
+            cin >> tarea;
+        } while (tarea < 0 || tarea > 35);
+
+        do {
+            cout << "\n     \n";
+            cout << "Ingrese nota del examen final (0-35): ";
+            cin >> examenFinal;
+            cout << "\n------------------------------------------\n";
+        } while (examenFinal < 0 || examenFinal > 35);
+
+        float notaFinal = primerParcial + segundoParcial + tarea + examenFinal;
+        notasFinales[i] = notaFinal;
+
+        if (notaFinal >= 60) {
+            estados[i] = "Aprobado";
+        } else {
+            estados[i] = "Desaprobado";
+        }
+    }
+}
+
+void mostrarResultados(string cursos[], float notasFinales[], string estados[]) {
+    cout << "\n      --- Resultados Finales ---\n";
+    cout << "\n                                      \n";
+    for (int i = 0; i < 5; i++) {
+        cout << cursos[i] << endl;
+        cout << "Nota final: " << notasFinales[i] << endl;
+        cout << "Estado del curso: " << estados[i] << endl;
+        cout << endl; 
+        cout << "\n------------------------------------------\n";
+    }
+}
+
+void registroNotas() {
+    int opcion;
+    bool continuar = true;
+
+    string ingenieriaCursos[5] = {"Algoritmos", "Algebra lineal", "Matematica discreta", "Pre calculo", "Contabilidad"};
+    string administracionCursos[5] = {"Contabilidad", "Marketing", "Recursos humanos", "Finanzas", "Estrategia"};
+    string derechoCursos[5] = {"Derecho civil", "Derecho penal", "Derecho mercantil", "Derecho constitucional", "Derecho internacional"};
+
+    while (continuar) {
+        cout << "\n------------------------------------------\n";
+        cout << "\n         --- Registro de Notas ---" << endl;
+        cout << "\n------------------------------------------\n";
+        cout << "1. Ingeniería en Sistemas" << endl;
+        cout << "2. Administración de Empresas" << endl;
+        cout << "3. Derecho" << endl;
+        cout << "4. Salir" << endl;
+        cout << "\n------------------------------------------\n";
+        cout << "Seleccione una opción: ";
+        cin >> opcion;
+        cout << "\n------------------------------------------\n";
+
+        switch (opcion) {
+            case 1: {
+                float notasFinales[5];
+                string estados[5];
+                ingresarNotas("Ingeniería en Sistemas", ingenieriaCursos, notasFinales, estados);
+                mostrarResultados(ingenieriaCursos, notasFinales, estados);
+                break;
+            }
+            case 2: {
+                float notasFinales[5];
+                string estados[5];
+                ingresarNotas("Administración de Empresas", administracionCursos, notasFinales, estados);
+                mostrarResultados(administracionCursos, notasFinales, estados);
+                break;
+            }
+            case 3: {
+                float notasFinales[5];
+                string estados[5];
+                ingresarNotas("Derecho", derechoCursos, notasFinales, estados);
+                mostrarResultados(derechoCursos, notasFinales, estados);
+                break;
+            }
+            case 4:
+                cout << "Saliendo del registro de notas." << endl;
+                continuar = false;
+                break;
+            default:
+                cout << "Opción no válida. Intente de nuevo." << endl;
+        }
+
+        if (continuar) {
+            char respuesta;
+            cout << "¿Desea volver a registrar notas? (s/n): ";
+            cin >> respuesta;
+            if (respuesta != 's' && respuesta != 'S') {
+                continuar = false;
+            }
+        }
+    }
+}
+
+
 void menu() {
     vector<Estudiante> estudiantes;
     int opcion;
@@ -373,7 +489,8 @@ void menu() {
         cout << "\n--- Sistema de Registro de Estudiantes ---\n";
         cout << "1. Registrar un estudiante\n";
         cout << "2. Asignar cursos\n";
-        cout << "3. Salir\n";
+        cout << "3. Control de notas\n";
+        cout << "4. Salir\n";
         cout << "------------------------------------------\n";
 
         if (!(cin >> opcion)) {
@@ -391,6 +508,9 @@ void menu() {
                 asignarCursos();
                 break;
             case 3:
+            registroNotas();
+            	break;
+            case 4:
                 cout << "Saliendo del programa...\n";
                 return;
             default:
