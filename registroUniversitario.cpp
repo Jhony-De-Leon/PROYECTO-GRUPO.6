@@ -2,64 +2,51 @@
 #include <vector>
 #include <string>
 #include <ctime>
-#include <limits>
 #include <cstdlib>
+#include <sstream>
+#include <cctype>
+#include <windows.h> 
 
 using namespace std;
 
-struct Estudiante {
-    int id;
+const string MORADO = "\033[35m";    
+const string VERDE = "\033[32m";     
+const string AZUL = "\033[34m";      
+const string BLANCO = "\033[37m";    
+const string ROJO = "\033[31m";
+const string GRIS_NORMAL = "\033[90m";
+const string RESET = "\033[0m"; 
+const string BLANCO_INTENSO = "\033[1;37m";
+
+struct Curso {
     string nombre;
-    string apellido;
+    string codigo;
+    char seccion;
+    float notaFinal; 
+};
+
+struct Estudiante {
+    string codigoPersonal;
+    string nombreCompleto;
     string carrera;
     string departamento;
     string municipio;
     string telefonoPersonal;
     string telefonoCasa;
-    string telefonoEmergencia;
-    string correoElectronico;  
-    int diaNacimiento, mesNacimiento, anioNacimiento;
+    string correoElectronico;
     int edad;
     int anioIngreso;
+    int semestre;
+    vector<Curso> cursos; 
 };
 
-const string departamentos[] = {
-    "Guatemala", "Sacatepéquez", "Chimaltenango", "Escuintla", "Santa Rosa",
-    "Sololá", "Totonicapán", "Quetzaltenango", "Suchitepéquez", "Retalhuleu",
-    "San Marcos", "Huehuetenango", "Quiché", "Baja Verapaz", "Alta Verapaz",
-    "Petén", "Izabal", "Zacapa", "Chiquimula", "Jalapa", "Jutiapa", "El Progreso"
-    
-};
+vector<Estudiante> estudiantes;
 
-const string municipios[22][5] = {
-    {"Guatemala", "Mixco", "Villa Nueva", "San Miguel Petapa", "Santa Catarina Pinula"},
-    {"Antigua Guatemala", "Ciudad Vieja", "Jocotenango", "Pastores", "Sumpango"},
-    {"Chimaltenango", "San Martín de los Canes", "El Tejar", "San José Poaquil", "San Juan Comalapa"},
-    {"Escuintla", "Santa Lucía Cotzumalguapa", "La Democracia", "San José", "Siquinalá"},
-    {"Santa Rosa de Lima", "Cuilapa", "San Juan Tecuaco", "Barberena", "Chiquimulilla"},
-    {"Solalá", "San Juan La Laguna", "San Pedro La Laguna", "Panajachel", "Santa Catarina Palopó"},
-    {"Totonicapán", "San Cristóbal Totonicapán", "San Francisco el Alto", "San Andrés Xecul", "Momostenango"},
-    {"Quetzaltenango", "Salcajá", "San Martín Sacatepéquez", "Sibilia", "Zunil"},
-    {"Mazatenango", "San Bernardino", "El Asintal", "San Antonio Suchitepéquez", "Santo Domingo Suchitepéquez"},
-    {"Retalhuleu", "San Sebastián", "San Martín Zapotitlán", "Tecoanapa", "Champerico"},
-    {"San Marcos", "San Pedro Sacatepéquez", "Malacatán", "San Antonio Sacatepéquez", "Sibinal"},
-    {"Huehuetenango", "Aguacatán", "Chiantla", "Colotenango", "Concepción Huista"},
-    {"Santa Cruz del Quiché", "San Antonio Ilotenango", "San Bartolomé Jocotenango", "San Pedro Jocopilas", "Patzité"},
-    {"Salamá", "Granados", "Rabinal", "San Jerónimo", "El Chol"},
-    {"Cobán", "San Pedro Carchá", "San Cristóbal Verapaz", "Tactic", "Tucurú"},
-    {"Flores", "Melchor de Mencos", "Poptún", "San Benito", "San Francisco"},
-    {"Puerto Barrios", "Livingston", "El Estor", "Morales", "Los Amates"},
-    {"Gualán", "Río Hondo", "La Unión", "San Jorge", "Estanzuela"},
-    {"Chiquimula", "Jocotán", "Esquipulas", "Camotán", "Ipala"},
-    {"Monjas", "San Pedro Pinula", "San Carlos Alzatate", "San Luis Jilotepeque", "Jalapa"},
-    {"Jutiapa", "Jalpatagua", "El Progreso", "Asunción Mita", "Santa Catarina Mita"},
-    {"Guastatoya", "Morazán", "Sanarate", "Sansare", "San Agustín Acasaguastlán"}
-   
-};
-
-int generarCodigo() {
-    static int codigo = 1000; 
-    return codigo++;
+string generarCodigoPersonal() {
+    int codigo = rand() % 9000 + 1000;
+    ostringstream ss;
+    ss << codigo;
+    return ss.str();
 }
 
 int calcularEdad(int diaNacimiento, int mesNacimiento, int anioNacimiento) {
@@ -75,452 +62,284 @@ int calcularEdad(int diaNacimiento, int mesNacimiento, int anioNacimiento) {
     if (mesNacimiento > mesActual || (mesNacimiento == mesActual && diaNacimiento > diaActual)) {
         edad--;
     }
-    
+
     return edad;
 }
 
-string escogerCarrera() {
+bool validarTelefono(const string& telefono) {
+    if (telefono.length() != 8) return false;
+    for (size_t i = 0; i < telefono.length(); ++i) {
+        if (!isdigit(telefono[i])) return false;
+    }
+    return true;
+}
+
+bool validarCodigoEstudiante(const string& codigo) {
+    if (codigo.length() != 4) return false;
+    for (size_t i = 0; i < codigo.length(); ++i) {
+        if (!isdigit(codigo[i])) return false;
+    }
+    return true;
+}
+
+int seleccionarOpcion(const string& mensaje, int maxOpcion) {
     int opcion;
-    cout << "\nSeleccione una carrera:\n";
-    cout << "1. Ingeniería en sistemas\n";
-    cout << "2. Administración de empresas\n";
-    cout << "3. Derecho\n";
     while (true) {
-    	cout << "\n------------------------------------------\n";
-        cout << "Ingrese el número de la carrera: ";
-        if (cin >> opcion && opcion >= 1 && opcion <= 3) {
-            switch(opcion) {
-                case 1: return "Ingeniería en sistemas";
-                case 2: return "Administración de empresas";
-                case 3: return "Derecho";
-            }
+        cout << mensaje;
+        cin >> opcion;
+        if (opcion >= 1 && opcion <= maxOpcion) {
+            return opcion;
         } else {
-            cout << "Valor inválido. Intente de nuevo.\n";
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Valor invalido, intente de nuevo.\n";
         }
     }
 }
 
-void escogerDireccion(string& departamento, string& municipio) {
-    int opcionDepto;
-    cout << "\n------------------------------------------\n";
-    cout << "\nSeleccione un departamento:\n";
-    for (int i = 0; i < 22; i++) {
+void mostrarIconoGiratorio() {
+    const char* iconos = "|/-\\";
+    for (int i = 0; i < 20; ++i) {
+        cout << "\r" << iconos[i % 4] << " Cargando... ";
+        cout.flush();
+        Sleep(100); 
+    }
+    cout << "\r"; 
+    cout << "                \r"; 
+}
+
+void mostrarEstudiante(const Estudiante& estudiante) {           
+    mostrarIconoGiratorio();
+    cout << GRIS_NORMAL << MORADO;
+    cout << "-----------------------------------------------------------\n";
+    cout << "\n             --- Estudiante Registrado ---\n";
+    cout << "-----------------------------------------------------------\n";
+    cout << "Codigo Personal: " << estudiante.codigoPersonal << "\n";
+    cout << "\n";
+    cout << "Nombre Completo: " << estudiante.nombreCompleto << "\n"; 
+    cout << "\n";
+    cout << "Carrera: " << estudiante.carrera << "\n";
+    cout << "\n";
+    cout << "Edad: " << estudiante.edad << "\n";
+    cout << "\n";
+    cout << "Departamento: " << estudiante.departamento << "\n";
+    cout << "\n";
+    cout << "Municipio: " << estudiante.municipio << "\n";
+    cout << "\n";
+    cout << "Telefono Personal: " << estudiante.telefonoPersonal << "\n";
+    cout << "\n";
+    cout << "Telefono de Casa: " << estudiante.telefonoCasa << "\n";
+    cout << "\n";
+    cout << "Correo Electronico: " << estudiante.correoElectronico << "\n";
+    cout << "\n";
+    cout << "Año de Ingreso: " << estudiante.anioIngreso << "\n";
+    cout << "\n";
+    cout << "Semestre: " << estudiante.semestre << "\n";
+    cout << "-----------------------------------------------------------\n";
+    
+}
+
+void mostrarCursosAsignados(const Estudiante& estudiante) {          
+    mostrarIconoGiratorio();
+    cout << GRIS_NORMAL << AZUL;
+    cout << " \n                --- Cursos Asignados ---\n";
+    cout << "-----------------------------------------------------------\n";
+    for (size_t k = 0; k < estudiante.cursos.size(); ++k) {
+        cout << "Curso: " << estudiante.cursos[k].nombre << "\n";
+        cout << "Codigo del Curso: " << estudiante.cursos[k].codigo << "\n";
+        cout << "Seccion Asignada: " << estudiante.cursos[k].seccion << "\n\n";
+    }
+    if (estudiante.cursos.empty()) {
+        cout << "No se han asignado cursos a este estudiante.\n";
+    }
+}
+
+void mostrarNotas(const Estudiante& estudiante) {               
+    mostrarIconoGiratorio();
+    cout << GRIS_NORMAL << ROJO;
+    cout << "\n                 --- Notas Asignadas ---\n";
+    cout << "-----------------------------------------------------------\n";
+    for (size_t k = 0; k < estudiante.cursos.size(); ++k) {
+        cout << "Curso: " << estudiante.cursos[k].nombre << "\n";
+        cout << "Nota Final: " << estudiante.cursos[k].notaFinal << "\n";
+        cout << "Estado Actual del Curso: " << (estudiante.cursos[k].notaFinal >= 60 ? "Aprobado" : "Desaprobado") << "\n";
+        cout << "-----------------------------------------------------------\n";
+    }
+    if (estudiante.cursos.empty()) {
+        cout << "No se han registrado notas para este estudiante.\n";
+    }
+}
+
+bool registrarEstudiante() {
+    Estudiante nuevoEstudiante;
+    nuevoEstudiante.codigoPersonal = generarCodigoPersonal();
+    cout << GRIS_NORMAL << BLANCO_INTENSO;
+    cout << "            --- Registro de estudiantes ---                       \n";
+    cout << "-----------------------------------------------------------\n";
+    cout << "Elija la carrera que desea cursar:\n";
+    cout << "1. Ingenieria en sistemas\n";
+    cout << "2. Derecho\n";
+    cout << "3. Auditoria\n";
+    cout << "-----------------------------------------------------------\n";
+    int carreraOpcion = seleccionarOpcion("Seleccione una opcion (1-3): ", 3);
+    cout << "-----------------------------------------------------------\n";
+    switch (carreraOpcion) {
+        case 1: nuevoEstudiante.carrera = "Ingenieria en sistemas"; break;
+        case 2: nuevoEstudiante.carrera = "Derecho"; break;
+        case 3: nuevoEstudiante.carrera = "Auditoria"; break;
+    }
+
+    
+    string primerNombre;
+    cout << "Ingrese el primer nombre: ";
+    cin.ignore(); 
+    getline(cin, primerNombre); 
+    cout << "-----------------------------------------------------------\n";
+    nuevoEstudiante.nombreCompleto = primerNombre;
+
+    
+    char agregarSegundoNombre;
+    cout << "¿Desea agregar un segundo nombre? (s/n): ";
+    cin >> agregarSegundoNombre;
+    cout << "-----------------------------------------------------------\n";
+    if (agregarSegundoNombre == 's' || agregarSegundoNombre == 'S') {
+        string segundoNombre;
+        cout << "Ingrese el segundo nombre: ";
+        cin.ignore(); 
+        getline(cin, segundoNombre);
+        cout << "-----------------------------------------------------------\n";
+        nuevoEstudiante.nombreCompleto += " " + segundoNombre;
+    }
+
+    
+    char agregarTercerNombre;
+    cout << "¿Desea agregar un tercer nombre? (s/n): ";
+    cin >> agregarTercerNombre;
+    cout << "-----------------------------------------------------------\n";
+    if (agregarTercerNombre == 's' || agregarTercerNombre == 'S') {
+        string tercerNombre;
+        cout << "Ingrese el tercer nombre: ";
+        cin.ignore(); 
+        getline(cin, tercerNombre);
+        cout << "-----------------------------------------------------------\n";
+        nuevoEstudiante.nombreCompleto += " " + tercerNombre;
+    }
+
+    
+    string primerApellido;
+    cout << "Ingrese el primer apellido: ";
+    cin.ignore(); 
+    getline(cin, primerApellido); 
+    cout << "-----------------------------------------------------------\n";
+    nuevoEstudiante.nombreCompleto += " " + primerApellido;
+
+
+    char agregarSegundoApellido;
+    cout << "¿Desea agregar un segundo apellido? (s/n): ";
+    cin >> agregarSegundoApellido;
+    cout << "-----------------------------------------------------------\n";
+    if (agregarSegundoApellido == 's' || agregarSegundoApellido == 'S') {
+        string segundoApellido;
+        cout << "Ingrese el segundo apellido: ";
+        cin.ignore(); 
+        getline(cin, segundoApellido); 
+        cout << "-----------------------------------------------------------\n";
+        nuevoEstudiante.nombreCompleto += " " + segundoApellido;
+    }
+
+    int diaNacimiento, mesNacimiento, anioNacimiento;
+    cout << "Ingrese la fecha de nacimiento (DD/MM/AAAA): ";
+    char slash;
+    cin >> diaNacimiento >> slash >> mesNacimiento >> slash >> anioNacimiento;
+    nuevoEstudiante.edad = calcularEdad(diaNacimiento, mesNacimiento, anioNacimiento);
+    cout << "-----------------------------------------------------------\n";
+
+    const string departamentos[] = {
+        "Guatemala", "Sacatepequez", "Chimaltenango", "Escuintla", "Santa Rosa",
+        "Solala", "Totonicapan", "Quetzaltenango", "Suchitepequez", "Retalhuleu"
+    };
+    cout << "Ingrese el numero del departamento en donde reside:\n";
+    for (int i = 0; i < 10; ++i) {
         cout << i + 1 << ". " << departamentos[i] << endl;
     }
+    cout << "-----------------------------------------------------------\n";
+    int deptoOpcion = seleccionarOpcion("Seleccione una opcion (1-10): ", 10);
+    nuevoEstudiante.departamento = departamentos[deptoOpcion - 1];
+    cout << "-----------------------------------------------------------\n";
+
+    const string municipios[10][5] = {
+        {"Guatemala", "Mixco", "Villa Nueva", "San Miguel Petapa", "Santa Catarina Pinula"},
+        {"Antigua Guatemala", "Ciudad Vieja", "Jocotenango", "Pastores", "Sumpango"},
+        {"Chimaltenango", "San Martin de los Canes", "El Tejar", "San Jose Poaquil", "San Juan Comalapa"},
+        {"Escuintla", "Santa Lucia Cotzumalguapa", "La Democracia", "San Jose", "Siquinala"},
+        {"Santa Rosa de Lima", "Cuilapa", "San Juan Tecuaco", "Barberena", "Chiquimulilla"},
+        {"Solala", "San Juan La Laguna", "San Pedro La Laguna", "Panajachel", "Santa Catarina Palopo"},
+        {"Totonicapan", "San Cristobal Totonicapan", "San Francisco el Alto", "San Andres Xecul", "Momostenango"},
+        {"Quetzaltenango", "Salcaja", "San Martín Sacatepequez", "Sibilia", "Zunil"},
+        {"Mazatenango", "San Bernardino", "El Asintal", "San Antonio Suchitepequez", "Santo Domingo Suchitepequez"},
+        {"Retalhuleu", "San Sebastian", "Champerico", "San Martin Zapotitlan", "Santa Cruz Mulua"}
+    };
+    cout << "Ingrese el numero del municipio en donde reside:\n";
+    for (int i = 0; i < 5; ++i) {
+        cout << i + 1 << ". " << municipios[deptoOpcion - 1][i] << endl;
+    }
+    cout << "-----------------------------------------------------------\n";
+    int municipioOpcion = seleccionarOpcion("Seleccione una opcion (1-5): ", 5);
+    nuevoEstudiante.municipio = municipios[deptoOpcion - 1][municipioOpcion - 1];
+    cout << "-----------------------------------------------------------\n";
+
+    cout << "Ingrese el telefono personal (8 digitos): ";
     while (true) {
-    	cout << "\n------------------------------------------\n";
-        cout << "Ingrese el número del departamento: ";
-        if (cin >> opcionDepto && opcionDepto >= 1 && opcionDepto <= 22) {
-            departamento = departamentos[opcionDepto - 1];
+        string telefono;
+        cin >> telefono;
+        cout << "-----------------------------------------------------------\n";
+        if (validarTelefono(telefono)) {
+            nuevoEstudiante.telefonoPersonal = telefono;
             break;
         } else {
-            cout << "Valor inválido. Intente de nuevo.\n";
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Teléfono invalido. Ingrese nuevamente (8 digitos): ";
         }
     }
 
-    int opcionMuni;
-    cout << "\n------------------------------------------\n";
-    cout << "\nSeleccione un municipio en " << departamento << ":\n";
-    for (int i = 0; i < 5; i++) {
-        cout << i + 1 << ". " << municipios[opcionDepto - 1][i] << endl;
-    }
+    cout << "Ingrese el telefono de casa (8 digitos): ";
     while (true) {
-    	cout << "\n------------------------------------------\n";
-        cout << "Ingrese el número del municipio: ";
-        if (cin >> opcionMuni && opcionMuni >= 1 && opcionMuni <= 5) {
-            municipio = municipios[opcionDepto - 1][opcionMuni - 1];
+        string telefono;
+        cin >> telefono;
+        cout << "-----------------------------------------------------------\n";
+        if (validarTelefono(telefono)) {
+            nuevoEstudiante.telefonoCasa = telefono;
             break;
         } else {
-            cout << "Valor inválido. Intente de nuevo.\n";
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Telefono invalido. Ingrese nuevamente (8 digitos): ";
         }
     }
-}
 
-void mostrarEstudiantes(const vector<Estudiante>& estudiantes) {
-    cout << "\n--- Lista de Estudiantes Registrados ---\n";
-    for (size_t i = 0; i < estudiantes.size(); i++) {
-        const Estudiante& estudiante = estudiantes[i];
-        cout << "ID: " << estudiante.id << endl;
-        cout << "Nombre: " << estudiante.nombre << " " << estudiante.apellido << endl;
-        cout << "Carrera: " << estudiante.carrera << endl;
-        cout << "Departamento: " << estudiante.departamento << endl;
-        cout << "Municipio: " << estudiante.municipio << endl;
-        cout << "Teléfono Personal: " << estudiante.telefonoPersonal << endl;
-        cout << "Teléfono de Casa: " << estudiante.telefonoCasa << endl;
-        cout << "Teléfono de Emergencia: " << estudiante.telefonoEmergencia << endl;
-        cout << "Correo Electrónico: " << estudiante.correoElectronico << endl;
-        cout << "Fecha de Nacimiento: " << estudiante.diaNacimiento << "/" 
-             << estudiante.mesNacimiento << "/" << estudiante.anioNacimiento << endl;
-        cout << "Edad: " << estudiante.edad << endl;
-        cout << "Año de Ingreso: " << estudiante.anioIngreso << endl;
-        cout << "------------------------------------------\n";
-    }
-}
-
-void registrarEstudiante(vector<Estudiante>& estudiantes) {
-    Estudiante nuevoEstudiante; 
-    nuevoEstudiante.id = generarCodigo(); 
-
-    cin.ignore();  
-    cout << "\n------------------------------------------\n";
-    cout << "Ingrese el nombre del estudiante: ";
-    getline(cin, nuevoEstudiante.nombre);
-    cout << "\n------------------------------------------\n";
-    cout << "Ingrese el apellido del estudiante: ";
-    getline(cin, nuevoEstudiante.apellido);
-    cout << "\n------------------------------------------\n";
-    
-    nuevoEstudiante.carrera = escogerCarrera();
-    
-    escogerDireccion(nuevoEstudiante.departamento, nuevoEstudiante.municipio);
-    cout << "\n------------------------------------------\n";
-    cout << "Ingrese el número de teléfono personal: ";
-    cin >> nuevoEstudiante.telefonoPersonal;
-    cout << "\n------------------------------------------\n";
-    cout << "Ingrese el número de teléfono de casa: ";
-    cin >> nuevoEstudiante.telefonoCasa;
-    cout << "\n------------------------------------------\n";
-    cout << "Ingrese el número de teléfono de emergencia: ";
-    cin >> nuevoEstudiante.telefonoEmergencia;
-    cout << "\n------------------------------------------\n";
-    cout << "Ingrese el correo electrónico: ";
+    cout << "Ingrese el correo electronico: ";
     cin >> nuevoEstudiante.correoElectronico;
+    cout << "-----------------------------------------------------------\n";
 
-    while (true) {
-    	cout << "\n------------------------------------------\n";
-        cout << "Ingrese la fecha de nacimiento (DD/MM/AAAA): ";
-        char separator; 
-        if (cin >> nuevoEstudiante.diaNacimiento >> separator 
-                  >> nuevoEstudiante.mesNacimiento >> separator 
-                  >> nuevoEstudiante.anioNacimiento) {
-            if (nuevoEstudiante.diaNacimiento >= 1 && nuevoEstudiante.diaNacimiento <= 31 &&
-                nuevoEstudiante.mesNacimiento >= 1 && nuevoEstudiante.mesNacimiento <= 12) {
-                break;
-            }
-        }
-        cout << "Valor inválido. Intente de nuevo.\n";
-        cin.clear();
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-    }
+    cout << "Ingrese el año de ingreso: ";
+    cin >> nuevoEstudiante.anioIngreso;
+    cout << "-----------------------------------------------------------\n";
 
-    nuevoEstudiante.edad = calcularEdad(nuevoEstudiante.diaNacimiento, nuevoEstudiante.mesNacimiento, nuevoEstudiante.anioNacimiento);
-    
-    while (true) {
-    	cout << "\n------------------------------------------\n";
-        cout << "Ingrese el año de ingreso a la universidad: ";
-        if (cin >> nuevoEstudiante.anioIngreso) break;
-        else {
-            cout << "Valor inválido. Intente de nuevo.\n";
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-        }
-    }
+    cout << "Ingrese el semestre: ";
+    cin >> nuevoEstudiante.semestre;
+    cout << " \n";
+    cout << " \n";
 
     estudiantes.push_back(nuevoEstudiante);
-    cout << "Estudiante registrado exitosamente!\n";
-    mostrarEstudiantes(estudiantes);
-}
-
-string generarCodigoAleatorio() {
-    const char caracteres[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    string codigo;
-    for (int i = 0; i < 6; ++i) { 
-        codigo += caracteres[rand() % (sizeof(caracteres) - 1)];
-    }
-    return codigo;
-}
-
-void asignarCursos() {
-    srand(time(0)); 
-    int opcion;
-    const int NUM_CURSOS = 5;
-    string cursosSistemas[NUM_CURSOS] = {"Algoritmos", "Álgebra Lineal", "Matemática Discreta", "Pre Cálculo", "Contabilidad"};
-    string cursosAdministracion[NUM_CURSOS] = {"Contabilidad", "Marketing", "Recursos Humanos", "Finanzas", "Estrategia"};
-    string cursosDerecho[NUM_CURSOS] = {"Derecho Civil", "Derecho Penal", "Derecho Mercantil", "Derecho Constitucional", "Derecho Internacional"};
-    string seccionElegida[NUM_CURSOS];
-    string codigos[NUM_CURSOS];
-
-    string codigoEstudiante;
-    cout << "Ingrese el código del estudiante: ";
-    cin >> codigoEstudiante;
-
-    cout << "\n------------------------------------------\n";
-    cout << "           Asignación de Cursos      \n";
-    cout << "\n------------------------------------------\n";
-
-    cout << "Seleccione una carrera:\n";
-    cout << "1. Ingeniería en Sistemas\n";
-    cout << "2. Administración de Empresas\n";
-    cout << "3. Derecho\n";
-    cout << "\n------------------------------------------\n";
-
-
-    while (true) {
-        cout << "Opción: ";
-        cin >> opcion;
-
-        if (cin.fail() || opcion < 1 || opcion > 3) {
-            cin.clear(); 
-            cin.ignore(10000, '\n'); 
-            cout << "Opción inválida. Inténtelo de nuevo.\n";
-        } else {
-            cin.ignore(10000, '\n'); 
-            break;  
-        }
-    }
-
-    switch (opcion) {
-        case 1:
-            cout << "\nCursos de Ingeniería en Sistemas:\n";
-            for (int i = 0; i < NUM_CURSOS; i++) {
-                codigos[i] = generarCodigoAleatorio(); 
-                char seccion;
-                while (true) {
-                    cout << i + 1 << ". " << cursosSistemas[i] << endl;
-                    cout << "Ingrese la sección a la que desea asignarse (A/B/C/D): ";
-                    cin >> seccion;
-                    if (seccion == 'A' || seccion == 'B' || seccion == 'C' || seccion == 'D') {
-                        break;  
-                    } else {
-                        cout << "Carácter inválido. Inténtelo de nuevo.\n";
-                    }
-                }
-                seccionElegida[i] = seccion;
-            }
-            break;
-
-        case 2:
-            cout << "\nCursos de Administración de Empresas:\n";
-            for (int i = 0; i < NUM_CURSOS; i++) {
-                codigos[i] = generarCodigoAleatorio(); 
-                char seccion;
-                while (true) {
-                    cout << i + 1 << ". " << cursosAdministracion[i] << endl;
-                    cout << "Ingrese la sección a la que desea asignarse (A/B/C/D): ";
-                    cin >> seccion;
-                    if (seccion == 'A' || seccion == 'B' || seccion == 'C' || seccion == 'D') {
-                        break;  
-                    } else {
-                        cout << "Carácter inválido. Inténtelo de nuevo.\n";
-                    }
-                }
-                seccionElegida[i] = seccion;
-            }
-            break;
-
-        case 3:
-            cout << "\nCursos de Derecho:\n";
-            for (int i = 0; i < NUM_CURSOS; i++) {
-                codigos[i] = generarCodigoAleatorio(); 
-                char seccion;
-                while (true) {
-                    cout << i + 1 << ". " << cursosDerecho[i] << endl;
-                    cout << "Ingrese la sección a la que desea asignarse (A/B/C/D): ";
-                    cin >> seccion;
-                    if (seccion == 'A' || seccion == 'B' || seccion == 'C' || seccion == 'D') {
-                        break;  
-                    } else {
-                        cout << "Carácter inválido. Inténtelo de nuevo.\n";
-                    }
-                }
-                seccionElegida[i] = seccion;
-            }
-            break;
-    }
-
-    cout << "\n------------------------------------------\n";
-    cout << "Código del estudiante: " << codigoEstudiante << endl; 
-    cout << "\n------------------------------------------\n";
-    cout << "                  Cursos            \n";
-    cout << "\n------------------------------------------\n";
     
-    if (opcion == 1) {
-        for (int i = 0; i < NUM_CURSOS; i++) {
-            cout << cursosSistemas[i] << " - Sección: " << seccionElegida[i] << endl;
-            cout << "Código: " << codigos[i] << endl;
-        }
-        cout << "\n------------------------------------------\n";
-        cout << "\nMonto a cancelar: Q670.00" << endl;
-    } else if (opcion == 2) {
-        for (int i = 0; i < NUM_CURSOS; i++) {
-            cout << cursosAdministracion[i] << " - Sección: " << seccionElegida[i] << endl;
-            cout << "Código: " << codigos[i] << endl; 
-        }
-        cout << "\n------------------------------------------\n";
-        cout << "\nMonto a cancelar: Q650.00" << endl;
-    } else if (opcion == 3) {
-        for (int i = 0; i < NUM_CURSOS; i++) {
-            cout << cursosDerecho[i] << " - Sección: " << seccionElegida[i] << endl;
-            cout << "Código: " << codigos[i] << endl; 
-        }
-        cout << "\n------------------------------------------\n";
-        cout << "\nMonto a cancelar: Q670.00" << endl;
+    mostrarEstudiante(nuevoEstudiante);
+    cout << GRIS_NORMAL << BLANCO;
+    cout << "Estudiante registrado con exito. Codigo Personal: " << nuevoEstudiante.codigoPersonal << "\n";
+    cout << "-----------------------------------------------------------\n";
+    
+    char volverARegistrar;
+    cout << "¿Quiere volver a registrar un estudiante? (s/n): ";
+    cin >> volverARegistrar;
+    cout << " \n";
+    cout << " \n";
+    if (volverARegistrar == 's' || volverARegistrar == 'S') {
+        registrarEstudiante(); 
     }
-}
 
-void ingresarNotas(string carrera, string cursos[], float notasFinales[], string estados[]) {
-    for (int i = 0; i < 5; i++) {
-        cout << "Curso: " << cursos[i] << endl;
-
-        float primerParcial, segundoParcial, tarea, examenFinal;
-        
-        do {
-            cout << "\n      \n";
-            cout << "Ingrese nota del primer parcial (0-15): ";
-            cin >> primerParcial;
-        } while (primerParcial < 0 || primerParcial > 15);
-        do {
-            cout << "\n       \n";
-            cout << "Ingrese nota del segundo parcial (0-15): ";
-            cin >> segundoParcial;
-        } while (segundoParcial < 0 || segundoParcial > 15);
-
-        do {
-            cout << "\n    \n";
-            cout << "Ingrese nota de la tarea (0-35): ";
-            cin >> tarea;
-        } while (tarea < 0 || tarea > 35);
-
-        do {
-            cout << "\n     \n";
-            cout << "Ingrese nota del examen final (0-35): ";
-            cin >> examenFinal;
-            cout << "\n------------------------------------------\n";
-        } while (examenFinal < 0 || examenFinal > 35);
-
-        float notaFinal = primerParcial + segundoParcial + tarea + examenFinal;
-        notasFinales[i] = notaFinal;
-
-        if (notaFinal >= 60) {
-            estados[i] = "Aprobado";
-        } else {
-            estados[i] = "Desaprobado";
-        }
-    }
-}
-
-void mostrarResultados(string cursos[], float notasFinales[], string estados[]) {
-    cout << "\n      --- Resultados Finales ---\n";
-    cout << "\n                                      \n";
-    for (int i = 0; i < 5; i++) {
-        cout << cursos[i] << endl;
-        cout << "Nota final: " << notasFinales[i] << endl;
-        cout << "Estado del curso: " << estados[i] << endl;
-        cout << endl; 
-        cout << "\n------------------------------------------\n";
-    }
-}
-
-void registroNotas() {
-    int opcion;
-    bool continuar = true;
-
-    string ingenieriaCursos[5] = {"Algoritmos", "Algebra lineal", "Matematica discreta", "Pre calculo", "Contabilidad"};
-    string administracionCursos[5] = {"Contabilidad", "Marketing", "Recursos humanos", "Finanzas", "Estrategia"};
-    string derechoCursos[5] = {"Derecho civil", "Derecho penal", "Derecho mercantil", "Derecho constitucional", "Derecho internacional"};
-
-    while (continuar) {
-        cout << "\n------------------------------------------\n";
-        cout << "\n         --- Registro de Notas ---" << endl;
-        cout << "\n------------------------------------------\n";
-        cout << "1. Ingeniería en Sistemas" << endl;
-        cout << "2. Administración de Empresas" << endl;
-        cout << "3. Derecho" << endl;
-        cout << "4. Salir" << endl;
-        cout << "\n------------------------------------------\n";
-        cout << "Seleccione una opción: ";
-        cin >> opcion;
-        cout << "\n------------------------------------------\n";
-
-        switch (opcion) {
-            case 1: {
-                float notasFinales[5];
-                string estados[5];
-                ingresarNotas("Ingeniería en Sistemas", ingenieriaCursos, notasFinales, estados);
-                mostrarResultados(ingenieriaCursos, notasFinales, estados);
-                break;
-            }
-            case 2: {
-                float notasFinales[5];
-                string estados[5];
-                ingresarNotas("Administración de Empresas", administracionCursos, notasFinales, estados);
-                mostrarResultados(administracionCursos, notasFinales, estados);
-                break;
-            }
-            case 3: {
-                float notasFinales[5];
-                string estados[5];
-                ingresarNotas("Derecho", derechoCursos, notasFinales, estados);
-                mostrarResultados(derechoCursos, notasFinales, estados);
-                break;
-            }
-            case 4:
-                cout << "Saliendo del registro de notas." << endl;
-                continuar = false;
-                break;
-            default:
-                cout << "Opción no válida. Intente de nuevo." << endl;
-        }
-
-        if (continuar) {
-            char respuesta;
-            cout << "¿Desea volver a registrar notas? (s/n): ";
-            cin >> respuesta;
-            if (respuesta != 's' && respuesta != 'S') {
-                continuar = false;
-            }
-        }
-    }
-}
-
-
-void menu() {
-    vector<Estudiante> estudiantes;
-    int opcion;
-
-    while (true) {
-    	cout << "------------------------------------------\n";
-        cout << "\n--- Sistema de Registro de Estudiantes ---\n";
-        cout << "1. Registrar un estudiante\n";
-        cout << "2. Asignar cursos\n";
-        cout << "3. Control de notas\n";
-        cout << "4. Salir\n";
-        cout << "------------------------------------------\n";
-
-        if (!(cin >> opcion)) {
-            cout << "Valor inválido. Intente de nuevo.\n";
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            continue; // Repetir el ciclo
-        }
-
-        switch (opcion) {
-            case 1:
-                registrarEstudiante(estudiantes);
-                break;
-            case 2:
-                asignarCursos();
-                break;
-            case 3:
-            registroNotas();
-            	break;
-            case 4:
-                cout << "Saliendo del programa...\n";
-                return;
-            default:
-                cout << "Opción inválida. Intente de nuevo.\n";
-                break;
-        }
-    }
-}
-
-int main() {
-    menu();
-    return 0;
+    return true;
 }
