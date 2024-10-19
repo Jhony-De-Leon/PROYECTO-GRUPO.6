@@ -510,5 +510,116 @@ void asignarCursos() {
 }
 
 
+void mostrarDatosRegistrados() {
+    int opcion;
+    do {
+        cout << GRIS_NORMAL << BLANCO_INTENSO;
+        cout << "\n            --- Mostrar Datos Registrados ---\n";
+        cout << "-----------------------------------------------------------\n";
+        cout << "1. Mostrar Estudiantes Registrados\n";
+        cout << "2. Mostrar Cursos Asignados\n";
+        cout << "3. Mostrar Notas Ingresadas\n";
+        cout << "4. Salir\n"; 
+        cout << "-----------------------------------------------------------\n";
+        opcion = seleccionarOpcion("Seleccione una opcion (1-4): ", 4);
+        cout << " \n";
+        cout << " \n";
+        
+
+        if (opcion == 1) {
+            string codigoEstudiante;
+            cout << "Ingrese el codigo del estudiante: ";
+            cin >> codigoEstudiante;
+
+            bool encontrado = false;
+            for (size_t i = 0; i < estudiantes.size(); ++i) {
+                if (estudiantes[i].codigoPersonal == codigoEstudiante) {
+                    mostrarEstudiante(estudiantes[i]);
+                    encontrado = true;
+                    break; 
+                }
+            }
+          
+        } else if (opcion == 2) {
+            string codigoEstudiante;
+            cout << "Ingrese el codigo del estudiante: ";
+            cin >> codigoEstudiante;
+
+            bool encontrado = false;
+            for (size_t i = 0; i < estudiantes.size(); ++i) {
+                if (estudiantes[i].codigoPersonal == codigoEstudiante) {
+                    mostrarCursosAsignados(estudiantes[i]);
+                    encontrado = true;
+                    break; 
+                }
+            }
+            
+        } else if (opcion == 3) {
+            string codigoEstudiante;
+            cout << "Ingrese el codigo del estudiante: ";
+            cin >> codigoEstudiante;
+
+            bool encontrado = false;
+            for (size_t i = 0; i < estudiantes.size(); ++i) {
+                if (estudiantes[i].codigoPersonal == codigoEstudiante) {
+                    mostrarNotas(estudiantes[i]);
+                    encontrado = true;
+                    break; 
+                }
+            }
+            
+        }
+
+    } while (opcion != 4); 
+}
+
+
+int main() {
+	system("COLOR 8F");
+    srand(static_cast<unsigned int>(time(0))); 
+    
+    mostrarIconoGiratorio();
+
+
+
+    int opcion;
+    do {
+    	cout << GRIS_NORMAL << BLANCO_INTENSO;
+    	cout << "===========================================================\n";
+        cout << "\n                 --- Menu Principal ---               \n";
+        cout << "===========================================================\n";
+        cout << "1. Registrar Estudiante                          \n";
+        cout << "2. Asignacion de Cursos                          \n";
+        cout << "3. Control de Notas                          \n";
+        cout << "4. Mostrar Datos Registrados            \n";
+        cout << "5. Salir                             \n";
+        cout << "-----------------------------------------------------------\n";
+        opcion = seleccionarOpcion("Seleccione una opcion (1-5): ", 5); 
+        cout << " \n";
+        cout << " \n";
+        cout << "-----------------------------------------------------------\n";
+
+        switch (opcion) {
+            case 1:
+                registrarEstudiante();
+                break;
+            case 2:
+                asignarCursos();
+                break;
+            case 3:
+                controlNotas();
+                break;
+            case 4:
+                mostrarDatosRegistrados();
+                break;
+            case 5:
+                cout << "Saliendo...\n";
+                break;
+        }
+    } while (opcion != 5);
+    
+    return 0;
+}
+
 
 
