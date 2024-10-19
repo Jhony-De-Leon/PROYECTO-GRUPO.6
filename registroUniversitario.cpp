@@ -343,3 +343,88 @@ bool registrarEstudiante() {
 
     return true;
 }
+
+
+void controlNotas() {
+    string codigoEstudiante;
+    
+    cout << "Ingrese el codigo del estudiante: ";
+    cin >> codigoEstudiante;
+    cout << " \n";
+    cout << " \n";
+    cout << "-----------------------------------------------------------\n";
+    cout << "\n                --- Control de notas ---\n";
+    cout << "-----------------------------------------------------------\n";
+
+    for (size_t i = 0; i < estudiantes.size(); ++i) {
+        if (estudiantes[i].codigoPersonal == codigoEstudiante) {
+            vector<string> resultados;
+
+            if (estudiantes[i].cursos.empty()) {
+                cout << "Ningun alumno con asignacion de cursos.\n";
+                return;
+            }
+
+            for (size_t j = 0; j < estudiantes[i].cursos.size(); ++j) {
+                float notaParcial1, notaParcial2, zonaTotal, notaExamenFinal;
+
+               
+                cout << "\nCurso: " << estudiantes[i].cursos[j].nombre << "\n";
+
+                
+                do {
+                    cout << "Ingrese la nota del primer parcial (0-15): ";
+                    cin >> notaParcial1;
+                } while (notaParcial1 < 0 || notaParcial1 > 15);
+
+                do {
+                    cout << "Ingrese la nota del segundo parcial (0-15): ";
+                    cin >> notaParcial2;
+                } while (notaParcial2 < 0 || notaParcial2 > 15);
+
+                do {
+                    cout << "Ingrese la zona total (0-35): ";
+                    cin >> zonaTotal;
+                } while (zonaTotal < 0 || zonaTotal > 35);
+
+                do {
+                    cout << "Ingrese la nota del examen final (0-35): ";
+                    cin >> notaExamenFinal;
+                    cout << "-----------------------------------------------------------\n";
+                } while (notaExamenFinal < 0 || notaExamenFinal > 35);
+
+                estudiantes[i].cursos[j].notaFinal = notaParcial1 + notaParcial2 + zonaTotal + notaExamenFinal;
+
+                string estado = (estudiantes[i].cursos[j].notaFinal >= 60) ? "Aprobado" : "Reprobado";
+                stringstream ss;
+                ss << estudiantes[i].cursos[j].notaFinal;
+
+                resultados.push_back("Curso: " + estudiantes[i].cursos[j].nombre);
+                resultados.push_back("Nota Final: " + ss.str());
+                resultados.push_back("Estado Actual del Curso: " + estado);
+                resultados.push_back("-----------------------------------------------------------");
+            }
+
+            mostrarIconoGiratorio();  
+            cout << GRIS_NORMAL << ROJO;
+            cout << "\n               --- Resultados Finales ---\n";
+            cout << "-----------------------------------------------------------\n";           
+            for (size_t k = 0; k < resultados.size(); ++k) {
+                cout << resultados[k] << "\n";
+            }
+
+            char volverRegistrar;
+            cout << GRIS_NORMAL << BLANCO;
+            cout << "¿Quieres volver a registrar notas? (s/n): ";
+            cin >> volverRegistrar;
+            cout << " \n";
+            cout << " \n";
+            if (volverRegistrar == 's' || volverRegistrar == 'S') {
+                controlNotas(); 
+            }
+            return; 
+        }
+    }
+
+    cout << "Estudiante no encontrado.\n";
+}
