@@ -428,3 +428,87 @@ void controlNotas() {
 
     cout << "Estudiante no encontrado.\n";
 }
+
+
+void asignarCursos() {
+    string codigo;
+    bool codigoValido = false;
+
+    while (!codigoValido) {
+        cout << "Ingrese el codigo del estudiante: ";
+        cin >> codigo;
+        cout << " \n";
+        cout << " \n";
+        cout << "-----------------------------------------------------------\n";
+
+        if (validarCodigoEstudiante(codigo)) {
+            codigoValido = true;
+            for (size_t i = 0; i < estudiantes.size(); ++i) {
+                if (estudiantes[i].codigoPersonal == codigo) {
+                    cout << "              --- Asignacion de cursos ---\n";
+                    cout << "-----------------------------------------------------------\n";
+                    cout << "Cursos disponibles para " << estudiantes[i].nombreCompleto << ":\n";
+                    cout << "-----------------------------------------------------------\n";
+
+                    string cursos[5];
+                    int cantidadCursos = 0;
+
+                    if (estudiantes[i].carrera == "Ingenieria en sistemas") {
+                        cursos[cantidadCursos++] = "Algebra lineal";
+                        cursos[cantidadCursos++] = "Algoritmos";
+                        cursos[cantidadCursos++] = "Contabilidad";
+                        cursos[cantidadCursos++] = "MatemAtica discreta";
+                        cursos[cantidadCursos++] = "Pre cAlculo";
+                    } else if (estudiantes[i].carrera == "Derecho") {
+                        cursos[cantidadCursos++] = "Derecho Civil";
+                        cursos[cantidadCursos++] = "Derecho Penal";
+                        cursos[cantidadCursos++] = "Derecho Constitucional";
+                        cursos[cantidadCursos++] = "Derecho Internacional";
+                        cursos[cantidadCursos++] = "Derecho Laboral";
+                    } else if (estudiantes[i].carrera == "Auditoría") {
+                        cursos[cantidadCursos++] = "Auditoria Financiera";
+                        cursos[cantidadCursos++] = "Auditoria Interna";
+                        cursos[cantidadCursos++] = "Auditoria de Sistemas";
+                        cursos[cantidadCursos++] = "Auditoria de Cumplimiento";
+                        cursos[cantidadCursos++] = "Auditoria Forense";
+                    }
+
+                    for (int j = 0; j < cantidadCursos; ++j) {
+                        char seccion;
+                        cout  << cursos[j] << "\n";
+                        cout << "\n";
+                        cout << "¿Que seccion desea asignarle? (A, B, C, D): ";
+                        cin >> seccion;
+                        cout << "-----------------------------------------------------------\n";
+
+                        Curso nuevoCurso;
+                        nuevoCurso.nombre = cursos[j];
+                        nuevoCurso.codigo = generarCodigoPersonal(); 
+                        nuevoCurso.seccion = seccion;
+
+                        estudiantes[i].cursos.push_back(nuevoCurso);
+                    }
+
+                    mostrarCursosAsignados(estudiantes[i]);
+
+                    
+                    char asignarOtro;
+                    cout << "-----------------------------------------------------------\n";
+                    cout << GRIS_NORMAL << BLANCO;
+                    cout << "¿Quiere asignarle cursos a otro alumno? (s/n): ";
+                    cin >> asignarOtro;
+                    cout << " \n";
+                    cout << " \n";
+                    if (asignarOtro == 's' || asignarOtro == 'S') {
+                        asignarCursos(); 
+                    }
+                    break;
+                }
+            }
+        }
+    }
+}
+
+
+
+
