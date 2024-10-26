@@ -29,6 +29,7 @@ struct Estudiante {
     string codigoPersonal;
     string nombreCompleto;
     string carrera;
+    string genero;
     string departamento;
     string municipio;
     string telefonoPersonal;
@@ -114,9 +115,11 @@ void mostrarEstudiante(const Estudiante& estudiante) {
     cout << "-----------------------------------------------------------\n";
     cout << "Codigo Personal: " << estudiante.codigoPersonal << "\n";
     cout << "\n";
+    cout << "Carrera: " << estudiante.carrera << "\n";
+    cout << "\n";
     cout << "Nombre Completo: " << estudiante.nombreCompleto << "\n"; 
     cout << "\n";
-    cout << "Carrera: " << estudiante.carrera << "\n";
+    cout << "Genero: " << estudiante.genero << "\n";
     cout << "\n";
     cout << "Edad: " << estudiante.edad << "\n";
     cout << "\n";
@@ -134,8 +137,8 @@ void mostrarEstudiante(const Estudiante& estudiante) {
     cout << "\n";
     cout << "Semestre: " << estudiante.semestre << "\n";
     cout << "-----------------------------------------------------------\n";
-    
 }
+
 
 void mostrarCursosAsignados(const Estudiante& estudiante) {          
     mostrarIconoGiratorio();
@@ -168,10 +171,10 @@ void mostrarNotas(const Estudiante& estudiante) {
     }
 }
 
+
 bool registrarEstudiante() {
     Estudiante nuevoEstudiante;
     nuevoEstudiante.codigoPersonal = generarCodigoPersonal();
-    cout << GRIS_NORMAL << BLANCO_INTENSO;
     cout << "            --- Registro de estudiantes ---                       \n";
     cout << "-----------------------------------------------------------\n";
     cout << "Elija la carrera que desea cursar:\n";
@@ -179,6 +182,7 @@ bool registrarEstudiante() {
     cout << "2. Derecho\n";
     cout << "3. Auditoria\n";
     cout << "-----------------------------------------------------------\n";
+
     int carreraOpcion = seleccionarOpcion("Seleccione una opcion (1-3): ", 3);
     cout << "-----------------------------------------------------------\n";
     switch (carreraOpcion) {
@@ -187,7 +191,14 @@ bool registrarEstudiante() {
         case 3: nuevoEstudiante.carrera = "Auditoria"; break;
     }
 
+    cout << "Seleccione el género:\n";
+    cout << "1. Masculino\n";
+    cout << "2. Femenino\n";
+    cout << "-----------------------------------------------------------\n";
     
+    int generoOpcion = seleccionarOpcion("Seleccione una opcion (1-2): ", 2);
+    nuevoEstudiante.genero = (generoOpcion == 1) ? "Masculino" : "Femenino";
+
     string primerNombre;
     cout << "Ingrese el primer nombre: ";
     cin.ignore(); 
@@ -195,11 +206,11 @@ bool registrarEstudiante() {
     cout << "-----------------------------------------------------------\n";
     nuevoEstudiante.nombreCompleto = primerNombre;
 
-    
     char agregarSegundoNombre;
     cout << "¿Desea agregar un segundo nombre? (s/n): ";
     cin >> agregarSegundoNombre;
     cout << "-----------------------------------------------------------\n";
+    
     if (agregarSegundoNombre == 's' || agregarSegundoNombre == 'S') {
         string segundoNombre;
         cout << "Ingrese el segundo nombre: ";
@@ -207,23 +218,21 @@ bool registrarEstudiante() {
         getline(cin, segundoNombre);
         cout << "-----------------------------------------------------------\n";
         nuevoEstudiante.nombreCompleto += " " + segundoNombre;
-    }
 
-    
-    char agregarTercerNombre;
-    cout << "¿Desea agregar un tercer nombre? (s/n): ";
-    cin >> agregarTercerNombre;
-    cout << "-----------------------------------------------------------\n";
-    if (agregarTercerNombre == 's' || agregarTercerNombre == 'S') {
-        string tercerNombre;
-        cout << "Ingrese el tercer nombre: ";
-        cin.ignore(); 
-        getline(cin, tercerNombre);
+        char agregarTercerNombre;
+        cout << "¿Desea agregar un tercer nombre? (s/n): ";
+        cin >> agregarTercerNombre;
         cout << "-----------------------------------------------------------\n";
-        nuevoEstudiante.nombreCompleto += " " + tercerNombre;
+        if (agregarTercerNombre == 's' || agregarTercerNombre == 'S') {
+            string tercerNombre;
+            cout << "Ingrese el tercer nombre: ";
+            cin.ignore(); 
+            getline(cin, tercerNombre);
+            cout << "-----------------------------------------------------------\n";
+            nuevoEstudiante.nombreCompleto += " " + tercerNombre;
+        }
     }
 
-    
     string primerApellido;
     cout << "Ingrese el primer apellido: ";
     cin.ignore(); 
@@ -231,18 +240,43 @@ bool registrarEstudiante() {
     cout << "-----------------------------------------------------------\n";
     nuevoEstudiante.nombreCompleto += " " + primerApellido;
 
-
-    char agregarSegundoApellido;
-    cout << "¿Desea agregar un segundo apellido? (s/n): ";
-    cin >> agregarSegundoApellido;
-    cout << "-----------------------------------------------------------\n";
-    if (agregarSegundoApellido == 's' || agregarSegundoApellido == 'S') {
-        string segundoApellido;
-        cout << "Ingrese el segundo apellido: ";
-        cin.ignore(); 
-        getline(cin, segundoApellido); 
+    if (generoOpcion == 2) {
+        cout << "¿Desea agregar:\n";
+        cout << "1. Apellido de casada\n";
+        cout << "2. Segundo apellido\n";
+        cout << "3. Ninguno\n";
         cout << "-----------------------------------------------------------\n";
-        nuevoEstudiante.nombreCompleto += " " + segundoApellido;
+        
+        int opcionApellidoCasada = seleccionarOpcion("Seleccione una opción (1-3): ", 3);
+
+        if (opcionApellidoCasada == 1) {
+            string apellidoCasada;
+            cout << "Ingrese el apellido de casada: ";
+            cin.ignore(); 
+            getline(cin, apellidoCasada);
+            cout << "-----------------------------------------------------------\n";
+            nuevoEstudiante.nombreCompleto += " " + apellidoCasada;
+        } else if (opcionApellidoCasada == 2) {
+            string segundoApellido;
+            cout << "Ingrese el segundo apellido: ";
+            cin.ignore(); 
+            getline(cin, segundoApellido);
+            cout << "-----------------------------------------------------------\n";
+            nuevoEstudiante.nombreCompleto += " " + segundoApellido;
+        }
+    } else {
+        char agregarSegundoApellido;
+        cout << "¿Desea agregar un segundo apellido? (s/n): ";
+        cin >> agregarSegundoApellido;
+        cout << "-----------------------------------------------------------\n";
+        if (agregarSegundoApellido == 's' || agregarSegundoApellido == 'S') {
+            string segundoApellido;
+            cout << "Ingrese el segundo apellido: ";
+            cin.ignore(); 
+            getline(cin, segundoApellido);
+            cout << "-----------------------------------------------------------\n";
+            nuevoEstudiante.nombreCompleto += " " + segundoApellido;
+        }
     }
 
     int diaNacimiento, mesNacimiento, anioNacimiento;
@@ -253,39 +287,69 @@ bool registrarEstudiante() {
     cout << "-----------------------------------------------------------\n";
 
     const string departamentos[] = {
-        "Guatemala", "Sacatepequez", "Chimaltenango", "Escuintla", "Santa Rosa",
-        "Solala", "Totonicapan", "Quetzaltenango", "Suchitepequez", "Retalhuleu"
+        "Guatemala", "Sacatepéquez", "Chimaltenango", "Escuintla", "Santa Rosa",
+        "Solola", "Totonicapan", "Quetzaltenango", "Suchitepequez", "Retalhuleu",
+        "San Marcos", "Huehuetenango", "Quiche", "Baja Verapaz", "Alta Verapaz",
+        "Peten", "Izabal", "Zacapa", "Chiquimula", "Jalapa", "Jutiapa", "El Progreso"
     };
+
     cout << "Ingrese el numero del departamento en donde reside:\n";
     for (int i = 0; i < 10; ++i) {
         cout << i + 1 << ". " << departamentos[i] << endl;
     }
     cout << "-----------------------------------------------------------\n";
+    
     int deptoOpcion = seleccionarOpcion("Seleccione una opcion (1-10): ", 10);
     nuevoEstudiante.departamento = departamentos[deptoOpcion - 1];
     cout << "-----------------------------------------------------------\n";
 
-    const string municipios[10][5] = {
-        {"Guatemala", "Mixco", "Villa Nueva", "San Miguel Petapa", "Santa Catarina Pinula"},
-        {"Antigua Guatemala", "Ciudad Vieja", "Jocotenango", "Pastores", "Sumpango"},
-        {"Chimaltenango", "San Martin de los Canes", "El Tejar", "San Jose Poaquil", "San Juan Comalapa"},
-        {"Escuintla", "Santa Lucia Cotzumalguapa", "La Democracia", "San Jose", "Siquinala"},
-        {"Santa Rosa de Lima", "Cuilapa", "San Juan Tecuaco", "Barberena", "Chiquimulilla"},
-        {"Solala", "San Juan La Laguna", "San Pedro La Laguna", "Panajachel", "Santa Catarina Palopo"},
-        {"Totonicapan", "San Cristobal Totonicapan", "San Francisco el Alto", "San Andres Xecul", "Momostenango"},
-        {"Quetzaltenango", "Salcaja", "San Martín Sacatepequez", "Sibilia", "Zunil"},
-        {"Mazatenango", "San Bernardino", "El Asintal", "San Antonio Suchitepequez", "Santo Domingo Suchitepequez"},
-        {"Retalhuleu", "San Sebastian", "Champerico", "San Martin Zapotitlan", "Santa Cruz Mulua"}
+    const std::string municipios[22][15] = {
+        {"Guatemala", "Mixco", "Villa Nueva", "San Miguel Petapa", "Santa Catarina Pinula", "San Jose del Golfo", "San Pedro Ayampuc", "Palencia", "Chinautla", "Fraijanes", "Amatitlan", "San Juan Sacatepequez", "Villa Canales"},
+        {"Antigua Guatemala", "San Lucas Sacatepeqez", "San Bartolome Milpas Altas", "Sumpango", "Magdalena Milpas Altas", "San Miguel Duenas", "Santa Maria de Jesus", "Ciudad Vieja", "Pastores", "San Juan Alotenango", "Acatenango"},
+        {"Chimaltenango", "San Jose Poaquil", "San Martin Jilotepeque", "Patzun", "Tecoanapa", "San Juan Comalapa", "Patzicia", "El Tejar", "San Andres Itzapa", "San Pedro Yepocapa", "Santa Apolonia"},
+        {"Escuintla", "Santa Lucia Cotzumalguapa", "La Democracia", "San Jose", "Masagua", "San Vicente Pacaya", "Nueva Concepcion", "El Rosario", "Siquinala", "Guanagazapa", "San Pedro Mazapa"},
+        {"Santa Rosa de Lima", "Cuilapa", "Barberena", "San Rafael Las Flores", "Chiquimulilla", "Guazacapan", "San Juan Tecuaco", "Santa Maria Ixhuatan", "El Sasle", "Oratorio", "San Pedro de Mitope"},
+        {"Solola", "San Jose Chacaya", "San Juan La Laguna", "San Pablo La Laguna", "San Marcos La Laguna", "Santa Catarina Palopo", "Santa Cruz La Laguna", "Chichicastenango", "Nahuala", "San Antonio Palopo", "San Lucas Toliman"},
+        {"Totonicapan", "San Cristobal Totonicapan", "San Francisco El Alto", "Santa Maria Chiquimula", "San Andres Xecul", "San Bartolo", "Momostenango", "Panchoy", "San Juan Ixcoy", "Santa Lucia La Reforma"},
+        {"Quetzaltenango", "Olintepeque", "San Carlos Sija", "Sibilia", "La Esperanza", "Salcaja", "San Francisco La Union", "Cantel", "Colomba", "Zunil", "San Mateo", "San Juan Bautista"},
+        {"Suchitepequez", "Mazatenango", "San Bernardino", "San Francisco Zapotitlan", "Zunilito", "Samayac", "San Miguel Panan", "Retalhuleu", "Santa Barbara", "San Jose El Idolo", "San Pedro La Laguna"},
+        {"Retalhuleu", "San Sebastian", "San Martin Zapotitlan", "El Asintal", "Nuevo San Carlos", "San Felipe", "Champerico", "San Andres Villa Seca", "Santa Cruz Mulua"},
+        {"San Marcos", "San Pedro Sacatepequez", "Tierra Blanca", "Nuevo Progreso", "Malacatan", "San Miguel Ixtahuacán", "La Reforma", "San Jose El Golfo", "Catarina", "Ixchiguan", "El Quetzal", "San Antonio Sacatepeqez"},
+        {"Huehuetenango", "Chiantla", "Cuilco", "Jacaltenango", "Nenton", "San Mateo Ixtatan", "San Juan Ixcoy", "San Pedro Necta", "La Libertad", "Malacatancito", "Santa Barbara"},
+        {"Quiche", "Santa Cruz del Quiche", "Chiche", "Zaragoza", "San Antonio Ilotenango", "San Juan Cotzal", "Chajul", "San Pedro Jocopilas", "Joyabaj", "Patzite", "El Quiche"},
+        {"Baja Verapaz", "Salama", "San Miguel Chicaj", "Rabinal", "Granados", "Santa Cruz El Chol", "San Jeronimo", "Purulha", "San Pedro Carchá"},
+        {"Alta Verapaz", "Coban", "Santa Cruz Verapaz", "San Cristobal Verapaz", "Tactic", "Raxruha", "San Juan Chamelco", "Chisec", "Fray Bartolome de las Casas", "Panzos", "Senahu", "La Tinta", "Lanquín", "San Pedro Carcha"},
+        {"Izabal", "Puerto Barrios", "Livingston", "El Estor", "Moran", "Los Amates", "Santa Maria Xalapan"},
+        {"Peten", "Flores", "Santa Elena", "San Benito", "La Libertad", "San Francisco", "Dolores", "Poptun", "Sayaxche", "Las Flores", "El Chal", "Tayasal", "San Andres", "San Luis", "San Jose"},
+        {"Zacapa", "Zacapa", "La Union", "Estanzuela", "Teculutan", "Gualan", "San Jorge", "Cabanas", "Huité", "Chiquimula de la Sierra", "San Juan Ermitas"},
+        {"Chiquimula", "Chiquimula", "San Jose La Arada", "Camotan", "Quezaltepeque", "San Juan Ermita", "Concepcion Las Minas", "Jocotan", "Olopa", "Cabanas"},
+        {"Jalapa", "Jalapa", "San Pedro Pinula", "San Luis Jilotepeque", "San Manuel Chaparron", "Mataquescuintla", "Tierra Blanca", "Nuevo Orleans"},
+        {"Jutiapa", "El Progreso", "Santa Catarina Mita", "San Jose Acatempa", "Agua Blanca", "Jerez", "Concepcion Jumaytepeque", "San Manuel", "Moyuta", "Tepec", "San Luis"},
+        {"El Progreso", "Guastatoya", "San Antonio La Paz", "San Cristobal Acasaguastlan", "Morazan", "Sanarate", "San Jose del Golfo"}
     };
+
     cout << "Ingrese el numero del municipio en donde reside:\n";
-    for (int i = 0; i < 5; ++i) {
+    int maxMunicipios = 0;
+    for (int i = 0; i < 15 && !municipios[deptoOpcion - 1][i].empty(); ++i) {
         cout << i + 1 << ". " << municipios[deptoOpcion - 1][i] << endl;
+        maxMunicipios++;
     }
     cout << "-----------------------------------------------------------\n";
-    int municipioOpcion = seleccionarOpcion("Seleccione una opcion (1-5): ", 5);
+
+    int municipioOpcion;
+    while (true) {
+        municipioOpcion = seleccionarOpcion("Seleccione una opcion: ", maxMunicipios);
+        if (municipioOpcion >= 1 && municipioOpcion <= maxMunicipios) {
+            break;
+        } else {
+            cout << "Opción inválida. Por favor ingrese un número entre 1 y " << maxMunicipios << ": ";
+        }
+    }
+
     nuevoEstudiante.municipio = municipios[deptoOpcion - 1][municipioOpcion - 1];
     cout << "-----------------------------------------------------------\n";
 
+    // Teléfonos
     cout << "Ingrese el telefono personal (8 digitos): ";
     while (true) {
         string telefono;
@@ -308,7 +372,7 @@ bool registrarEstudiante() {
             nuevoEstudiante.telefonoCasa = telefono;
             break;
         } else {
-            cout << "Telefono invalido. Ingrese nuevamente (8 digitos): ";
+            cout << "Teléfono invalido. Ingrese nuevamente (8 digitos): ";
         }
     }
 
@@ -325,17 +389,14 @@ bool registrarEstudiante() {
     cout << " \n";
     cout << " \n";
 
-    estudiantes.push_back(nuevoEstudiante);
-    
+    // Aquí añadirías el nuevo estudiante a la lista
     mostrarEstudiante(nuevoEstudiante);
-    cout << GRIS_NORMAL << BLANCO;
-    cout << "Estudiante registrado con exito. Codigo Personal: " << nuevoEstudiante.codigoPersonal << "\n";
+    cout << "Estudiante registrado con éxito. Código Personal: " << nuevoEstudiante.codigoPersonal << "\n";
     cout << "-----------------------------------------------------------\n";
     
     char volverARegistrar;
     cout << "¿Quiere volver a registrar un estudiante? (s/n): ";
     cin >> volverARegistrar;
-    cout << " \n";
     cout << " \n";
     if (volverARegistrar == 's' || volverARegistrar == 'S') {
         registrarEstudiante(); 
@@ -343,7 +404,6 @@ bool registrarEstudiante() {
 
     return true;
 }
-
 
 void controlNotas() {
     string codigoEstudiante;
@@ -620,6 +680,3 @@ int main() {
     
     return 0;
 }
-
-
-
